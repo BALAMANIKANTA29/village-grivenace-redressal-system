@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Home - VGRS{% endblock %}
+
+{% block content %}
+<div class="jumbotron text-center">
+    <h1 class="display-4">Welcome to Village Grievance Redressal System</h1>
+    <p class="lead">A platform to submit and track grievances in your village.</p>
+    {% if not current_user.is_authenticated %}
+    <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg me-2">Register</a>
+    <a href="{{ url_for('login') }}" class="btn btn-secondary btn-lg">Login</a>
+    {% else %}
+    <a href="{{ url_for('submit_complaint') }}" class="btn btn-primary btn-lg me-2">Submit Complaint</a>
+    <a href="{{ url_for('track_complaint') }}" class="btn btn-secondary btn-lg">Track Complaint</a>
+    {% endif %}
+</div>
+{% endblock %}

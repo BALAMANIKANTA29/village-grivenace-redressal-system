@@ -1,0 +1,87 @@
+/* Custom styles for VGRS with YSRCP colors */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #ffffff;
+    background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.jumbotron {
+    background: linear-gradient(135deg, #008000 0%, #000080 100%);
+    color: white;
+    padding: 4rem 2rem;
+    margin-bottom: 2rem;
+    border-radius: 0.5rem;
+}
+
+.card {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.table {
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.btn-primary {
+    background-color: #008000;
+    border-color: #008000;
+}
+
+.btn-primary:hover {
+    background-color: #006400;
+    border-color: #004d00;
+}
+
+.footer {
+    margin-top: auto;
+}
+
+.alert {
+    border-radius: 0.5rem;
+}
+
+/* YSRCP theme elements: Green, White, Blue */
+.navbar {
+    background-color: #008000 !important;
+}
+
+.navbar-brand, .navbar-nav .nav-link {
+    color: #ffffff !important;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #000080 !important;
+}
+
+.btn-secondary {
+    background-color: #000080;
+    border-color: #000080;
+}
+
+.btn-secondary:hover {
+    background-color: #000066;
+    border-color: #00004d;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #008000;
+}
+
+.text-primary {
+    color: #008000 !important;
+}
+
+.bg-light {
+    background-color: #ffffff !important;
+}

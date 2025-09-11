@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - VGRS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-12">
+        <h2 class="text-center mb-4">Admin Dashboard - Manage Complaints</h2>
+        {% if complaints %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Photo</th>
+                            <th>Officer Remarks</th>
+                            <th>Submitted</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for complaint in complaints %}
+                        <tr>
+                            <td>{{ complaint.complaint_id }}</td>
+                            <td>{{ complaint.user.name }}<br>{{ complaint.user.email }}</td>
+                            <td>{{ complaint.category }}</td>
+                            <td>{{ complaint.description[:50] }}{% if complaint.description|length > 50 %}...{% endif %}</td>
+                            <td>
+                                <span class="badge bg-{{ 'warning' if complaint.status == 'Pending' else 'info' if complaint.status == 'In-progress' else 'success' }}">
+                                    {{ complaint.status }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if complaint.photo %}
+                                    <a href="{{ url_for('static', filename=complaint.photo.split('static/')[-1]) }}" target="_blank">View</a>
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>{{ complaint.officer_remarks or 'N/A' }}</td>
+                            <td>{{ complaint.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('update_complaint', complaint_id=complaint.complaint_id) }}">
+                                    <select name="status" class="form-select mb-2" required>
+                                        <option value="Pending" {% if complaint.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                        <option value="In-progress" {% if complaint.status == 'In-progress' %}selected{% endif %}>In-progress</option>
+                                        <option value="Resolved" {% if complaint.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                                    </select>
+                                    <textarea name="remarks" class="form-control mb-2" placeholder="Officer remarks">{{ complaint.officer_remarks }}</textarea>
+                                    <button type="submit" class="btn btn-sm btn-primary w-100">Update</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-center">No complaints found.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

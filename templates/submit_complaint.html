@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Complaint - VGRS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h2 class="text-center mb-4">Submit a New Complaint</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="category" class="form-label">Category</label>
+                <select class="form-control" id="category" name="category" required>
+                    <option value="">Select Category</option>
+                    <option value="Water">Water</option>
+                    <option value="Electricity">Electricity</option>
+                    <option value="Health">Health</option>
+                    <option value="Roads">Roads</option>
+                    <option value="Sanitation">Sanitation</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="5" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="photo" class="form-label">Photo (optional)</label>
+                <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Submit Complaint</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
