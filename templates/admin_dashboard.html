@@ -1,67 +1,97 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Dashboard - VGRS{% endblock %}
+{% block title %}Admin Portal - GPGMS{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-12">
-        <h2 class="text-center mb-4">Admin Dashboard - Manage Complaints</h2>
-        {% if complaints %}
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>ID</th>
-                            <th>User</th>
-                            <th>Category</th>
-                            <th>Description</th>
-                            <th>Status</th>
-                            <th>Photo</th>
-                            <th>Officer Remarks</th>
-                            <th>Submitted</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for complaint in complaints %}
-                        <tr>
-                            <td>{{ complaint.complaint_id }}</td>
-                            <td>{{ complaint.user.name }}<br>{{ complaint.user.email }}</td>
-                            <td>{{ complaint.category }}</td>
-                            <td>{{ complaint.description[:50] }}{% if complaint.description|length > 50 %}...{% endif %}</td>
-                            <td>
-                                <span class="badge bg-{{ 'warning' if complaint.status == 'Pending' else 'info' if complaint.status == 'In-progress' else 'success' }}">
-                                    {{ complaint.status }}
-                                </span>
-                            </td>
-                            <td>
-                                {% if complaint.photo %}
-                                    <a href="{{ url_for('static', filename=complaint.photo.split('static/')[-1]) }}" target="_blank">View</a>
-                                {% else %}
-                                    N/A
-                                {% endif %}
-                            </td>
-                            <td>{{ complaint.officer_remarks or 'N/A' }}</td>
-                            <td>{{ complaint.created_at.strftime('%Y-%m-%d') }}</td>
-                            <td>
-                                <form method="POST" action="{{ url_for('update_complaint', complaint_id=complaint.complaint_id) }}">
-                                    <select name="status" class="form-select mb-2" required>
-                                        <option value="Pending" {% if complaint.status == 'Pending' %}selected{% endif %}>Pending</option>
-                                        <option value="In-progress" {% if complaint.status == 'In-progress' %}selected{% endif %}>In-progress</option>
-                                        <option value="Resolved" {% if complaint.status == 'Resolved' %}selected{% endif %}>Resolved</option>
-                                    </select>
-                                    <textarea name="remarks" class="form-control mb-2" placeholder="Officer remarks">{{ complaint.officer_remarks }}</textarea>
-                                    <button type="submit" class="btn btn-sm btn-primary w-100">Update</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Central Grievance Monitoring Dashboard</h3>
+                <span class="badge bg-danger">ADMIN VIEW</span>
             </div>
-        {% else %}
-            <p class="text-center">No complaints found.</p>
-        {% endif %}
+            <div class="card-body">
+                {% if complaints %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Citizen</th>
+                                <th>Dept / Category</th>
+                                <th>Location</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for complaint in complaints %}
+                            <tr>
+                                <td>{{ complaint.complaint_id }}</td>
+                                <td>
+                                    <div>{{ complaint.user.name }}</div>
+                                    <small class="text-muted">{{ complaint.user.email }}</small>
+                                </td>
+                                <td>
+                                    <strong>{{ complaint.department }}</strong><br>
+                                    <small>{{ complaint.category }}</small>
+                                </td>
+                                <td>
+                                    <small>
+                                        {{ complaint.district }}, {{ complaint.mandal }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="text-truncate" style="max-width: 200px;"
+                                        title="{{ complaint.description }}">
+                                        {{ complaint.description }}
+                                    </div>
+                                    {% if complaint.photo %}
+                                    <a href="{{ url_for('static', filename=complaint.photo.split('static/')[-1]) }}"
+                                        target="_blank" class="text-decoration-none"><i class="fas fa-paperclip"></i>
+                                        View Proof</a>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span
+                                        class="badge bg-{{ 'warning' if complaint.status in ['Submitted', 'Pending'] else 'info' if complaint.status == 'In Progress' else 'success' if complaint.status == 'Resolved' else 'danger' }}">
+                                        {{ complaint.status }}
+                                    </span>
+                                </td>
+                                <td>{{ complaint.officer_remarks or '-' }}</td>
+                                <td>
+                                    <form method="POST"
+                                        action="{{ url_for('update_complaint', complaint_id=complaint.complaint_id) }}">
+                                        <div class="input-group input-group-sm mb-1">
+                                            <select name="status" class="form-select" required>
+                                                <option value="Submitted" {% if complaint.status=='Submitted'
+                                                    %}selected{% endif %}>Submitted</option>
+                                                <option value="In Progress" {% if complaint.status=='In Progress'
+                                                    %}selected{% endif %}>In Progress</option>
+                                                <option value="Resolved" {% if complaint.status=='Resolved' %}selected{%
+                                                    endif %}>Resolved</option>
+                                                <option value="Rejected" {% if complaint.status=='Rejected' %}selected{%
+                                                    endif %}>Rejected</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-outline-primary">Update</button>
+                                        </div>
+                                        <input type="text" name="remarks" class="form-control form-control-sm"
+                                            placeholder="Official remarks..."
+                                            value="{{ complaint.officer_remarks or '' }}">
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center py-5 text-muted">No grievances found in the system.</p>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

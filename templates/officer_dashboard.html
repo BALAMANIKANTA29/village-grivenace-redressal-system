@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Department Officer Dashboard - GPGMS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-success text-white">
+                <h3 class="mb-0"><i class="fas fa-briefcase me-2"></i>Department Officer Dashboard</h3>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5>Department: <span class="text-primary">{{ current_user.department }}</span></h5>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Jurisdiction: <span class="text-primary">{{ current_user.assigned_district }}</span> {% if
+                            current_user.assigned_mandal %}({{ current_user.assigned_mandal }}){% endif %}</h5>
+                    </div>
+                </div>
+
+                {% if complaints %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Ref ID</th>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Location</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Proof</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for complaint in complaints %}
+                            <tr>
+                                <td>#{{ complaint.complaint_id }}</td>
+                                <td>{{ complaint.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ complaint.category }}</span>
+                                </td>
+                                <td>
+                                    <small>
+                                        <strong>Dist:</strong> {{ complaint.district }}<br>
+                                        <strong>Mandal:</strong> {{ complaint.mandal }}
+                                        {% if complaint.ward %}<br><strong>Ward:</strong> {{ complaint.ward }}{% endif
+                                        %}
+                                    </small>
+                                </td>
+                                <td style="max-width: 250px;">
+                                    <div class="text-truncate" title="{{ complaint.description }}">{{
+                                        complaint.description }}</div>
+                                </td>
+                                <td>
+                                    {% if complaint.status == 'Submitted' or complaint.status == 'Pending' %}
+                                    <span class="badge bg-warning text-dark">{{ complaint.status }}</span>
+                                    {% elif complaint.status == 'In Progress' %}
+                                    <span class="badge bg-info">{{ complaint.status }}</span>
+                                    {% elif complaint.status == 'Resolved' %}
+                                    <span class="badge bg-success">{{ complaint.status }}</span>
+                                    {% elif complaint.status == 'Rejected' %}
+                                    <span class="badge bg-danger">{{ complaint.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if complaint.photo %}
+                                    <a href="{{ url_for('static', filename=complaint.photo.split('static/')[-1]) }}"
+                                        target="_blank" class="btn btn-sm btn-outline-primary">View</a>
+                                    {% else %}
+                                    <span class="text-muted">None</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form method="POST"
+                                        action="{{ url_for('update_complaint', complaint_id=complaint.complaint_id) }}">
+                                        <select name="status" class="form-select form-select-sm mb-2" required>
+                                            <option value="Submitted" {% if complaint.status=='Submitted' %}selected{%
+                                                endif %}>Submitted</option>
+                                            <option value="In Progress" {% if complaint.status=='In Progress'
+                                                %}selected{% endif %}>In Progress</option>
+                                            <option value="Resolved" {% if complaint.status=='Resolved' %}selected{%
+                                                endif %}>Resolved</option>
+                                            <option value="Rejected" {% if complaint.status=='Rejected' %}selected{%
+                                                endif %}>Rejected</option>
+                                        </select>
+                                        <input type="text" name="remarks" class="form-control form-control-sm mb-2"
+                                            placeholder="Remarks" value="{{ complaint.officer_remarks or '' }}">
+                                        <button type="submit" class="btn btn-sm btn-primary w-100">Update</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">No grievances found for your assigned jurisdiction.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

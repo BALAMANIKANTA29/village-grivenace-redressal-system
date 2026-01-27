@@ -15,6 +15,24 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vgrs.db'
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
+# Category to Department Mapping
+CATEGORY_MAPPING = {
+    'Public Services': 'General Administration',
+    'Infrastructure & Development': 'Infrastructure Dept',
+    'Health & Medical Services': 'Health Dept',
+    'Education': 'Education Dept',
+    'Revenue & Land': 'Revenue Dept',
+    'Law & Order / Public Safety': 'Police Dept',
+    'Employment & Welfare Schemes': 'Employment Dept',
+    'Banking & Financial Services': 'Finance Dept',
+    'Social Welfare': 'Social Welfare Dept',
+    'Housing & Urban Development': 'Housing Dept',
+    'Agriculture & Environment': 'Agriculture Dept',
+    'Transport': 'Transport Dept',
+    'Documentation & Certificates': 'Revenue Dept',
+    'Others': 'General Administration'
+}
+
 db.init_app(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -62,6 +80,8 @@ def login():
         user = User.query.filter_by(email=email).first()
         if user and check_password_hash(user.password, password):
             login_user(user)
+            if user.role == 'Officer':
+                return redirect(url_for('officer_dashboard'))
             return redirect(url_for('home'))
         else:
             flash('Invalid email or password')
@@ -121,17 +141,29 @@ def submit_complaint():
         description = request.form['description']
         photo = request.files.get('photo')
 
-        photo_path = None
         if photo and photo.filename:
             filename = secure_filename(photo.filename)
             photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             photo.save(photo_path)
 
+        # Auto-assign department
+        department = CATEGORY_MAPPING.get(category, 'General Administration')
+        
+        # Get location details
+        district = request.form['district']
+        mandal = request.form['mandal']
+        ward = request.form.get('ward', '')
+
         new_complaint = Complaint(
             user_id=current_user.id,
             category=category,
+            department=department,
             description=description,
-            photo=photo_path
+            district=district,
+            mandal=mandal,
+            ward=ward,
+            photo=photo_path,
+            status='Submitted'
         )
         db.session.add(new_complaint)
         db.session.commit()
@@ -173,6 +205,26 @@ def admin_dashboard():
     complaints = Complaint.query.all()
     return render_template('admin_dashboard.html', complaints=complaints)
 
+@app.route('/officer_dashboard')
+@login_required
+def officer_dashboard():
+    if current_user.role != 'Officer':
+        flash('Access denied. Officer privileges required.')
+        return redirect(url_for('home'))
+
+    # Filter by Department and District
+    query = Complaint.query.filter_by(
+        department=current_user.department, 
+        district=current_user.assigned_district
+    )
+    
+    # If officer is assigned to specific mandal, filter by it too
+    if current_user.assigned_mandal:
+        query = query.filter_by(mandal=current_user.assigned_mandal)
+        
+    complaints = query.all()
+    return render_template('officer_dashboard.html', complaints=complaints)
+
 @app.route('/admin_login', methods=['GET', 'POST'])
 @login_required
 def admin_login():
@@ -195,7 +247,8 @@ def admin_login():
 @app.route('/update_complaint/<int:complaint_id>', methods=['POST'])
 @login_required
 def update_complaint(complaint_id):
-    if not current_user.is_admin:
+    # Allow Admin or Officer
+    if not current_user.is_admin and current_user.role != 'Officer':
         flash('Access denied')
         return redirect(url_for('home'))
 
@@ -208,6 +261,8 @@ def update_complaint(complaint_id):
     db.session.commit()
 
     flash('Complaint updated successfully')
+    if current_user.role == 'Officer':
+        return redirect(url_for('officer_dashboard'))
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/contact')
