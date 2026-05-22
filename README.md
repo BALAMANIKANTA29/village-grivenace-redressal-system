@@ -1,7 +1,7 @@
 # Village Grievance Redressal System (VGRS)
 
 ## Project Overview
-The Village Grievance Redressal System (VGRS) is a web application built with Flask that allows users to register, submit complaints related to various categories, track the status of their complaints, and communicate with administrators. The system also provides an admin dashboard for managing and updating complaints.
+The Village Grievance Redressal System (VGRS) is a web application built with Flask that allows users to register, submit complaints related to various categories, track the status of their complaints, and receive updates. The system provides an efficient and transparent mechanism for handling grievances at the village level.
 
 ## Features
 - User registration and login with secure password hashing
@@ -58,6 +58,3 @@ The Village Grievance Redressal System (VGRS) is a web application built with Fl
 - `static/`: Static files including CSS, JavaScript, and uploaded photos.
 - `instance/vgrs.db`: SQLite database file (created after initialization).
 - `requirements.txt`: Python dependencies list.
-
-## License
-This project is licensed under the MIT License.
